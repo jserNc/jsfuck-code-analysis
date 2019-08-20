@@ -189,7 +189,8 @@ alert(1)
       6: "[!+[]+!+[]+!+[]+!+[]+!+[]+!+[]]",
       7: "[!+[]+!+[]+!+[]+!+[]+!+[]+!+[]+!+[]]",
       8: "[!+[]+!+[]+!+[]+!+[]+!+[]+!+[]+!+[]+!+[]]",
-      9: "[!+[]+!+[]+!+[]+!+[]+!+[]+!+[]+!+[]+!+[]+!+[]]"}
+      9: "[!+[]+!+[]+!+[]+!+[]+!+[]+!+[]+!+[]+!+[]+!+[]]"
+    }
   */
   function fillMissingDigits(){
     var output, number, i;
@@ -362,6 +363,7 @@ alert(1)
       // 缓存所有包含非基本字符的键值对
       missing = {};
 
+      // 自己添加的变量，方便理解代码执行过程
       解析好的键值对 = {}
 
       for (all in MAPPING){
@@ -561,23 +563,70 @@ alert(1)
 
           Function('return eval')() === eval
 
-          output -> `eval(${output})``
+          output = `eval(${output})`
         */
         output = "[][" + encode("fill") + "]" +
           "[" + encode("constructor") + "]" +
           "(" + encode("return eval") +  ")()" +
           "(" + output + ")";
+        console.log('wrapWithEval && runInParentScope output:', output); 
+        console.log('wrapWithEval && runInParentScope typeof output:', typeof output); 
       } else {
         /*
           []['fill']['constructor'] -> Function
 
           Function('return 1+1')() === 2
+
+          output = `Function(${output})()`
+          
+          关于 Function 构造函数：
+          可以传递任意数量的参数给 Function 构造函数，只有最后一个参数会被当做函数体，如果只有一个参数，该参数就是函数体。
+          
+          ① 3 个参数
+          var add = new Function(
+            'x',
+            'y',
+            'return x + y'
+          );
+
+          // 等同于
+          function add(x, y) {
+            return x + y;
+          }
+          
+          ② 1 个参数
+          var foo = new Function(
+            'return "hello world"'
+          );
+
+          // 等同于
+          function foo() {
+            return 'hello world';
+          }
+
+          另外，Function 构造函数可以不使用 new 命令，返回结果完全一样。
         */
+       console.log('wrapWithEval output:', output); 
+        console.log('wrapWithEval typeof output:', typeof output); 
         output = "[][" + encode("fill") + "]" +
           "[" + encode("constructor") + "]" +
           "(" + output + ")()";
       }
     }
+
+    /*
+      关于 eval 和 Function 作用域的区别：
+
+      var val = 'global scope'
+
+      function f(){
+         var val = 'local scope'
+         eval('console.log(val)')           //local scope
+         Function('console.log(val)')()     //global scope
+      }
+
+      f()
+     */
 
     return output;
   }
