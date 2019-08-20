@@ -1,7 +1,7 @@
 # jsfuck-code-analysis
 jsfuck源码注释
 
-```
+```javascript
 /*! JSFuck 0.4.0 - http://jsfuck.com */
 
 (function(self){
